@@ -7,8 +7,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#include <winsock.h>
+#include <sys/socket.h>
 
+#define BUFSIZE 257
 
 int main() {
 	int serv_sd;
@@ -31,8 +32,7 @@ int main() {
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serv_addr.sin_port = htons(atoi(argv[1]));
 
-	bind(serv_sd, ( struct sockaddr * )&serv_addr,
-		 sizeof(serv_addr));
+	bind(serv_sd, ( struct sockaddr * )&serv_addr, sizeof(serv_addr));
 	listen(serv_sd, 5);
 
 
