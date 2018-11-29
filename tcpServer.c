@@ -11,8 +11,6 @@
 
 
 int main() {
-	SOCKET sock, clinetSock;
-
 	int serv_sd;
 	int clnt_sd;
 	int fd;
@@ -23,7 +21,8 @@ int main() {
 	int clnt_addr_size;
 	int len;
 
-	fd = open("file_server.c", O_RDONLY); //ÆÄÀÏ¿ÀÇÂ
+	// File open.
+	fd = open("file_server.c", O_RDONLY);
 
 	serv_sd = socket(PF_INET, SOCK_STREAM, 0);
 
@@ -37,7 +36,27 @@ int main() {
 	listen(serv_sd, 5);
 
 
+	clnt_addr_size = sizeof(clnt_addr);
+	clnt_sd = accept(serv_sd,
+					 ( struct sockaddr * )&clnt_addr,
+					 &clnt_addr_size);
+	
+	// Send a file to client.
+	while ( ( len = read(fd, buf, BUFSIZE) ) != 0 ) {
+		write(clnt_sd, buf, len);
+	}
 
+	//  End file sending, and close output stream.
+	if ( shutdown(clnt_sd, SHUT_WR) == -1 ) {
+		error_handling("shutdown() error");
+	}
+
+	// Import message "Thank you" from client.
+	len = read(clnt_sd, buf, BUFSIZE);
+	write(1, buf, len); // Write the messeage on console.
+
+	close(fd);
+	close(clnt_sd);
 
     return 0;
 }
