@@ -33,21 +33,15 @@ int main(int argc, char **argv) {
  
     if(argc != 3)
         error_handling("Format : client [IP address] [port number]");
- 
-    // client_socket = socket(PF_INET, SOCK_STREAM, 0);
-    // if(client_socket == -1)
-    //     error_handling("SOCKET OPEN ERROR");
 
     // File open to be saved a file that will be recieve from server.
-    // file = open("received.txt", O_RDWR | O_CREAT | O_TRUNC, 777);
-
-    if((file = open("received.txt", O_WRONLY | O_CREAT | O_EXCL, 777)) == -1) {
+    if((file = open("received.txt", O_WRONLY | O_CREAT | O_EXCL, 0777)) == -1) {
         remove("received.txt");
-        file = open("received.txt", O_WRONLY | O_CREAT, 777);
-    }
+        file = open("received.txt", O_WRONLY | O_CREAT, 0777);
 
-    if(file == -1)
-        error_handling("RECIEVE FILE OPEN ERROR");
+        if(file == -1)
+            error_handling("RECIEVE FILE OPEN ERROR");
+    }
 
     client_socket = socket(PF_INET, SOCK_STREAM, 0);
     if(client_socket == -1)
