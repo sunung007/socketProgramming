@@ -39,7 +39,13 @@ int main(int argc, char **argv) {
     //     error_handling("SOCKET OPEN ERROR");
 
     // File open to be saved a file that will be recieve from server.
-    file = open("received.txt", O_RDWR | O_CREAT | O_TRUNC);
+    // file = open("received.txt", O_RDWR | O_CREAT | O_TRUNC, 777);
+
+    if((file = open("received.txt", O_WRONLY | O_CREAT | O_EXCL, 777)) == -1) {
+        remove("received.txt");
+        file = open("received.txt", O_WRONLY | O_CREAT, 777);
+    }
+
     if(file == -1)
         error_handling("RECIEVE FILE OPEN ERROR");
 
