@@ -86,7 +86,45 @@ server에서 전송한 파일을 받기 위해서 아래와 같은 함수 호출
 ### 파일 열기
 server에서 받은 파일을 disk에 저장하기 위해서 file을 write mode로 open해야한다. 그런데 write 전용 모드로 열 경우, 같은 이름의 파일이 disk에 있을 경우 error을 발생시키기 때문에 아래와 같은 과정을 거쳤다.
 
-  1. 파일을 write 전용 모드로 열고, 기존에 같은 이름의 파일이 있을 경우 아래의 과정을 거친다.
-  2. 기존에 있던 파일을 삭제하고 wirte 전용 모드로 새로 파일을 open한다.
-  3. 만약 새 파일이 open되지 않을 경우 error을 발생시킨다.
+>  1. 파일을 write 전용 모드로 열고, 기존에 같은 이름의 파일이 있을 경우 아래의 과정을 거친다.
+>  2. 기존에 있던 파일을 삭제하고 wirte 전용 모드로 새로 파일을 open한다.
+>  3. 만약 새 파일이 open되지 않을 경우 error을 발생시킨다.
 
+또한 파일을 open할 때 모든 권한을 모든 user에게 부여하기 위하여 ```open()```의 세번째 인자로 **0777**을 주었다.
+
+```
+if((file = open("received.txt", O_WRONLY | O_CREAT | O_EXCL, 0777)) == -1) {
+  remove("received.txt");
+  file = open("received.txt", O_WRONLY | O_CREAT, 0777);
+
+  if(file == -1)
+      error_handling("RECIEVE FILE OPEN ERROR");
+}
+```
+
+### socket
+client에서는 server에서 설정한 socket의 종류에 알맞게 socket을 생성할 수 있도록 socket의 세번째 인자로 0을 주었다.
+
+```
+client_socket = socket(PF_INET, SOCK_STREAM, 0);
+```
+
+### connect
+```connect()```가 ```extern```으로 선언되어있는 ```sys/socket.h```파일을 살펴보면 ```connect()```에 대한 설명으로, 함수 호출이 성공적으로 마무리 되었으면 0을, error가 발생했을 경우에는 -1을 return한다고 되었다. 따라서 ```connect()```의 return value가 -1일 경우 ```error_handling()```을 호출해서 error handle을 하였다.
+
+### read
+```recv()```의 경우 client socket으로 받은 내용을 buffer에 저장을 한다. 이 때 buffer에 저장한 크기, 즉 client socket으로부터 읽은 파일의 크기만큼을 return하게 되고, 만약 읽은 파일이 빈 파일일 경우에는 0을 return한다. 따라서 읽은 파일이 빈파일이 아닌 동안 계속해서 client socket으로부터 읽은 내용을 buffer에 저장하고, buffer에 저장된 내용을 다시 file에 wirte하도록 하였다.
+
+```
+while((len = recv(client_socket, buffer, BUFSIZE, 0)) != 0)
+  write(file, buffer, len);
+```
+
+### 파일 수신이 완료된 경우
+파일 수신이 완료되었을 때, server로 **Thank you** message를 보내어 띄우도록 하였다.
+
+----------
+
+## 실행 결과
+![Alt text](/socketProgramming/client.PNG)
+![Alt text](socketProgramming/server.PNG)
