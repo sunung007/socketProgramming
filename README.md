@@ -26,13 +26,6 @@ server.c와 client.c에서 모두 error handle을 위하여 ```error_handling()`
 -----------
 
 ## Server
-### 개요
-server에서 client로 파일을 전송하기 위해서는 크게 아래의 함수 호출의 과정을 거친다.
-
-***socket -> bind -> listen -> accept -> send -> close***
-
-- socket
-
 ### 실행
 server에서 client로 파일을 전송하기 위해서 server을 실행할 때 client의 port number를 main의 인자로 보내야한다. 때문에 실행 format인 ```./server [client_port_number]```을 준수하지 않았을 경우,
 ```
@@ -40,5 +33,23 @@ if(argc != 2)
   error_handling("Format : server [port]");
 ```
 을 실행시켜 프로그램을 종료한다.
+
+### 개요
+server에서 client로 파일을 전송하기 위해서는 크게 아래의 함수 호출의 과정을 거친다.
+
+**순서: *socket -> bind -> listen -> accept -> send -> close***
+
+### socket
+TCP protocol에서 사용하는 socket을 생성하기 위해서 3번째 argument로 6을 설정하였다. socket은 close하더라도 커널은 socket을 바로 kill하지 않고 일정 시간동안 alive한 상태(TIME_WAIT)로 유지한다. 이는 client로 아직 전송하지 않은 파일을 처리할 수 있도록 하기 위함이다. 이 때문에 프로그램을 종료한 뒤 일정시간 동안은 프로그램을 다시 실행시킬 경우 bind error가 발생한다.
+
+이를 해결하기 위해서 ```server_socket```을 생성할 때 option을 부여해야한다. socket에 ```SO_REUSEADDR```이라는 옵션을 부여할 경우, 같은 port에 대해 다른 socket이 bind되는 것을 가능하게 해준다. 따라서 아래와 같은 코드를 추가하였다.
+
+```
+option = 1;
+setsockopt( server_socket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option) );
+```
+
+```option = 1```을 통해서 ```SO_REUSEADDR```의 option을 1(TRUE)하게 설정하고, ```setsockopt()```을 통해서 socket의 option을 설정해주었다.
+
 
 ### 파일 오픈
