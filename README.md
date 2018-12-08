@@ -3,11 +3,14 @@
 
 컴퓨터소프트웨어학부 2017029425 김선웅
 
+--------
+
 ## 개발환경
 ubuntu 18.04.1 LTS
 
 vim version 8.0.1453
 
+---------
 
 ## 개요
 client-server model에서 TCP/IP protocol을 이용한 소켓 프로그래밍.
@@ -18,8 +21,12 @@ server에서 client로 파일(*.txt*)을 전송할 수 있도록 구현하였다
 
 client의 ip adress는 *127.0.0.1*이고, port number는 50000으로 설정하였다.
 
+----------
+
 ## Error handling.
 server.c와 client.c에서 모두 error handle을 위하여 ```error_handling()```함수를 구현하였다. 만약 에러가 발생할 경우 ```error_handling()```의 인자로 error message를 넣고 호출하여, 해당 message와 개행문자(\n)를 **STDERR**로 출력을 보내고 프로그램을 종료하게 구현하였다.
+
+-----------
 
 ## Server
 ### 개요
