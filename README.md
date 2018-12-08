@@ -70,3 +70,23 @@ while((len = read(file, buffer, BUFSIZE)) != 0)
 ------------
 
 ## client
+### 실행
+server와 연결하기 위해서, client를 실행할 때는 server와 matching이 되는 ip address와 port number을 main의 인자로 넣어야 한다. 따라서 ```./client [ip_address] [port_number]```의 형식으로 실행하지 않으면 error을 발생시켰다.
+
+```
+if(argc != 3)
+  error_handling("Format : client [IP address] [port number]");
+```
+
+### 개요
+server에서 전송한 파일을 받기 위해서 아래와 같은 함수 호출 순서를 거쳐야한다.
+
+**순서: *socket -> connect -> recv -> close***
+
+### 파일 열기
+server에서 받은 파일을 disk에 저장하기 위해서 file을 write mode로 open해야한다. 그런데 write 전용 모드로 열 경우, 같은 이름의 파일이 disk에 있을 경우 error을 발생시키기 때문에 아래와 같은 과정을 거쳤다.
+
+  1. 파일을 write 전용 모드로 열고, 기존에 같은 이름의 파일이 있을 경우 아래의 과정을 거친다.
+  2. 기존에 있던 파일을 삭제하고 wirte 전용 모드로 새로 파일을 open한다.
+  3. 만약 새 파일이 open되지 않을 경우 error을 발생시킨다.
+
