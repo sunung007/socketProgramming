@@ -126,6 +126,6 @@ while((len = recv(client_socket, buffer, BUFSIZE, 0)) != 0)
 ----------
 
 ## 실행 결과
-![Server_result](./result_images/server.PNG)
+![Server_result](./report/result_images/server.PNG)
 
-![Client_result](./result_images/client.PNG)
+![Client_result](./report/result_images/client.PNG)
