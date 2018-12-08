@@ -42,7 +42,7 @@ server에서 client로 파일을 전송하기 위해서는 크게 아래의 함�
 ### socket
 TCP protocol에서 사용하는 socket을 생성하기 위해서 3번째 argument로 6을 설정하였다. socket은 close하더라도 커널은 socket을 바로 kill하지 않고 일정 시간동안 alive한 상태(TIME_WAIT)로 유지한다. 이는 client로 아직 전송하지 않은 파일을 처리할 수 있도록 하기 위함이다. 이 때문에 프로그램을 종료한 뒤 일정시간 동안은 프로그램을 다시 실행시킬 경우 bind error가 발생한다.
 
-이를 해결하기 위해서 ```server_socket```을 생성할 때 option을 부여해야한다. socket에 ```SO_REUSEADDR```이라는 옵션을 부여할 경우, 같은 port에 대해 다른 socket이 bind되는 것을 가능하게 해준다. 따라서 아래와 같은 코드를 추가하였다.
+이를 해결하기 위해서 ```server_socket```을 생성할 때 option을 부여해야한다. socket에 ```SO_REUSEADDR```이라는 option을 부여할 경우, 같은 port에 대해 다른 socket이 bind되는 것을 가능하게 해준다. 따라서 아래와 같은 코드를 추가하였다.
 
 ```
 option = 1;
@@ -52,4 +52,21 @@ setsockopt( server_socket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option) );
 ```option = 1```을 통해서 ```SO_REUSEADDR```의 option을 1(TRUE)하게 설정하고, ```setsockopt()```을 통해서 socket의 option을 설정해주었다.
 
 
-### 파일 오픈
+### bind, listen, accept
+함수 호출 형식에 맞춰서 호출을 하고, 호출한 결과가 error을 나타낼 경우 ```error_handling()```을 통해서 error handle을 하였다.
+
+bind, listen, accept의 선언부를 살펴보면 모두 *sys/socket.h*에 ```extern```으로 선언이 되어있는데, 각 함수에 관해 설명이 되어있는 주석을 살펴보면, 함수 호출 결과가 success인 경우 0을, error가 발생할 경우 -1을 return한다고 되어있다. 따라서 각 함수의 return value가 -1일 경우 error로 간주하고 ```error_handling()```을 수행하도록 하였다.
+
+### send
+이번 socket program에서 server에서 client로 파일 전송이 이루어지기 때문에 ```server.c```에서는 buffer size(BUFSIZE, 2048)만큼 file에서 buffer로 읽고 client socket에 write하는 과정을 반복하도록 하였다. ```read()```의 경우 읽은 file의 size만큼을 return value로 돌려준다. 따라서 return value가 0일 경우에는 파일에 읽을 것이 없다는 의미이므로
+
+```
+while((len = read(file, buffer, BUFSIZE)) != 0)
+  write(client_socket, buffer, len);
+```
+
+을 통해 파일에 읽을 것이 있는 동안 read와 write를 반복하도록 하였다.
+
+------------
+
+## client
