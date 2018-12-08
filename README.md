@@ -3,14 +3,13 @@
 
 컴퓨터소프트웨어학부 2017029425 김선웅
 
-## 개발환경
+## 개발환경 및 개요
+### 개발환경
 ubuntu 18.04.1 LTS
 
 vim version 8.0.1453
 
----------
-
-## 개요
+### 개요
 client-server model에서 TCP/IP protocol을 이용한 소켓 프로그래밍.
 
 server에서 client로 파일(*.txt*)을 전송할 수 있도록 구현하였다.
