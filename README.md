@@ -18,7 +18,9 @@ server에서 client로 파일(*.txt*)을 전송할 수 있도록 구현하였다
 편의상 server에서 client로 ```sending.txt```파일을 전송하고, client에서 해당 파일을 ```received.txt```로 저장한다.
 파일 전송이 완료될 경우 server는 client로 부터 ***Thank you*** 라는 메세지를 받고 종료가 되고, client는 그냥 종료가 된다.
 
-client의 ip주소는 *127.0.0.1*이고, port 주소는 50000으로 설정하였다.
+client의 ip adress는 *127.0.0.1*이고, port number는 50000으로 설정하였다.
+
+### server
 
 
 
