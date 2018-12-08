@@ -3,6 +3,15 @@
 
 // 2017029425 KimSunWoong 
 
+// Develop enviroment
+// ubuntu 18.04.1 LTS
+// vim version 8.0.1453
+// gcc option does not exist
+
+// A file is sent from server to client. In server, the file to be sent
+// is named with "sending.txt", and the file to be received is named
+// with "received.txt".
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,7 +23,9 @@
 #include <fcntl.h>
   
 #define BUFSIZE 2048
- 
+
+// Make error message and kill the program
+// when error occurs.
 void error_handling(char *message) {
     fputs(message, stderr);
     fputc('\n', stderr);
@@ -35,30 +46,33 @@ int main(int argc, char **argv) {
         error_handling("Format : server [port]");
 
     // Open file to send.
+	// A file is sent from server to client. So I do not need to
+	// set a permission like 0777.
     file = open("sending.txt", O_RDONLY);
     if(file == -1)
         error_handling("SEND FILE OPEN ERROR");
  
-    // socket(), bind(), listen(), and accept() return -1 when errors occur.
-
     // Make new socket with 6, which is TCP protocol.
-    server_socket = socket(PF_INET, SOCK_STREAM, 6);
+    // The option is to prevent bind error. If I make socekt as soon as closing 
+	// the socket, bind error ouccrs. So to prevent it, I must set option to socket.
+	server_socket = socket(PF_INET, SOCK_STREAM, 6);
     option = 1;
     setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
 
     if(server_socket == -1)
         error_handling("SOCKET OPEN ERROR");
  
+	// Set a server socket.
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     server_addr.sin_port = htons(atoi(argv[1]));
 
-    // Bind.
+    // Bind
     if(bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
         error_handling("BIND ERROR");
 
-    // Listen. Second argument is maximum number of client.
+    // Listen. The second argument is maximum number of client.
     if(listen(server_socket, 5) == -1)
         error_handling("LISTEN ERROR");
 
@@ -80,6 +94,7 @@ int main(int argc, char **argv) {
     len = read(client_socket, buffer, BUFSIZE);
     write(1, buffer, len);
 
+	// Close file and sockets.
     close(file);
     close(client_socket);
     close(server_socket);
