@@ -1,11 +1,9 @@
 # Socket Programming
-
 컴퓨터네트워크(12510, 조인휘 교수님) 기말 과제
 
 컴퓨터소프트웨어학부 2017029425 김선웅
 
 ## 개발환경
-
 ubuntu 18.04.1 LTS
 
 vim version 8.0.1453
@@ -20,15 +18,23 @@ server에서 client로 파일(*.txt*)을 전송할 수 있도록 구현하였다
 
 client의 ip adress는 *127.0.0.1*이고, port number는 50000으로 설정하였다.
 
-### server
+## Error handling.
+server.c와 client.c에서 모두 error handle을 위하여 ```error_handling()```함수를 구현하였다. 만약 에러가 발생할 경우 ```error_handling()```의 인자로 error message를 넣고 호출하여, 해당 message와 개행문자(\n)를 **STDERR**로 출력을 보내고 프로그램을 종료하게 구현하였다.
 
+## Server
+### 개요
+server에서 client로 파일을 전송하기 위해서는 크게 아래의 함수 호출의 과정을 거친다.
 
+***socket -> bind -> listen -> accept -> send -> close***
 
+- socket
 
+### 실행
+server에서 client로 파일을 전송하기 위해서 server을 실행할 때 client의 port number를 main의 인자로 보내야한다. 때문에 실행 format인 ```./server [client_port_number]```을 준수하지 않았을 경우,
+```
+if(argc != 2)
+  error_handling("Format : server [port]");
+```
+을 실행시켜 프로그램을 종료한다.
 
-
-
-
-
-
-This is a program to do file exchange in TCP/IP protocol using TCP, not UDP. I used Server-Client model, but in this program I implemented function, which is sending a file from server to client.
+### 파일 오픈
